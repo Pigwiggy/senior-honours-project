@@ -1,3 +1,5 @@
+# Testing script to verify package imports and data loading
+
 import sys
 import numpy as np
 import pandas as pd
@@ -21,5 +23,3 @@ print(raw_df.head())
 HiggsM_df = raw_df['HiggsM']
 print(HiggsM_df.shape)
 print(HiggsM_df.head()) 
-
-print("School laptop test")

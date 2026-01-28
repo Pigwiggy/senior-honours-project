@@ -1,3 +1,5 @@
+# Debugging script to print environment information
+
 import sys, os, platform, pathlib
 
 print("sys.executable:", sys.executable)
