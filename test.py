@@ -19,6 +19,7 @@ with h5py.File('data_files/new_Input_NonResonant_yy_25th_January2026.h5', 'r') a
 raw_df = pd.read_hdf('data_files/new_Input_NonResonant_yy_25th_January2026.h5', key='VBF_Polarisation_Tree')
 print(raw_df.shape)
 print(raw_df.head())
+print(raw_df.columns)
 
 HiggsM_df = raw_df['HiggsM']
 print(HiggsM_df.shape)
