@@ -23,14 +23,40 @@ print(pole_data['DNN_score'].mean(), tail_data_1['DNN_score'].mean(), tail_data_
 
 print(tail_data_1.shape, tail_data_2.shape, pole_data.shape)
 
-# Make histograms of HiggsM
+print(raw_df["OO1"].describe())
+
+
 """
-plt.figure(figsize=(10,6))
-plt.hist(raw_df['HiggsM'], bins=100, alpha=0.7, color='blue', label='HiggsM Distribution')
-plt.xlabel('Higgs Mass (HiggsM)')
-plt.ylabel('Frequency')
-plt.title('Histogram of Higgs Mass (HiggsM)')
+# Calculate average OO1 values for HiggsM intervals
+bins = 50  # Number of intervals
+raw_df['HiggsM_bin'] = pd.cut(raw_df['HiggsM'], bins=bins)
+avg_oo1_by_higgs = raw_df.groupby('HiggsM_bin')['is_Passed_yy'].mean()
+bin_centers = [interval.mid for interval in avg_oo1_by_higgs.index]
+
+# Make bar chart of average OO1 values at each HiggsM interval
+plt.figure(figsize=(14,7))
+plt.bar(range(len(avg_oo1_by_higgs)), avg_oo1_by_higgs.values, width=0.8, color='steelblue', alpha=0.7)
+plt.xlabel('HiggsM Interval')
+plt.ylabel('Average target variable')
+plt.title('Average target variable Values by HiggsM Interval')
+plt.xticks(range(0, len(avg_oo1_by_higgs), 5), [f'{bin_centers[i]:.0f}' for i in range(0, len(bin_centers), 5)], rotation=45)
+plt.grid(alpha=0.3, axis='y')
+plt.tight_layout()
+plt.show()
+"""
+
+
+
+# Line graph with one data point every 1000 rows
+sampled_df = raw_df.iloc[::1000].reset_index(drop=True)
+plt.figure(figsize=(14,7))
+plt.scatter(sampled_df['HiggsM'], sampled_df['DNN_score'], marker='o', color='darkblue', label=f'Sampled Data (n={len(sampled_df)})')
+plt.xlabel('HiggsM')
+plt.ylabel('DNN_score')
+plt.title('DNN_score vs HiggsM (Sampled: 1 point per 1000 rows)')
 plt.legend()
-plt.grid()
-plt.show()  
-"""
+plt.grid(alpha=0.3)
+plt.tight_layout()
+plt.show()
+
+# 
