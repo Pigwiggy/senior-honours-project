@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import h5py
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
 
 raw_df = pd.read_hdf('data_files/new_Input_NonResonant_yy_25th_January2026.h5', key='VBF_Polarisation_Tree')
 
@@ -32,7 +33,7 @@ model_df_tails = model_df[mask1 | mask2]
 # Fit a polynomial regression model
 X = model_df_tails[['HiggsM']]
 y = model_df_tails['Frequency']
-poly = PolynomialFeatures(degree=3)
+poly = PolynomialFeatures(degree = 3)
 X_poly = poly.fit_transform(X)
 lin_reg = LinearRegression()
 lin_reg.fit(X_poly, y)
@@ -44,14 +45,16 @@ X_pole_poly = poly.transform(X_pole)
 y_pole_pred = lin_reg.predict(X_pole_poly)
 
 # Evaluate model performance with MSE
-y_pole_actual = model_df_pole['Frequency'].values
-mse = np.mean((y_pole_actual - y_pole_pred) ** 2)
-mse_normilized = mse / np.mean(y_pole_actual)
+y_pole_true = model_df_pole['Frequency'].values
+mse = mean_squared_error(y_pole_true, y_pole_pred)
+mse_normilized = mse / np.var(y_pole_true)
 print(f"Mean Squared Error (normalized) on pole region: {mse_normilized}")  
 
 plt.scatter(X,y)
 plt.scatter(X_pole, y_pole_pred, color='red')
 # plt.show()  
+
+
 
 
 
