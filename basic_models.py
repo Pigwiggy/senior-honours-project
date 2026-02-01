@@ -56,19 +56,6 @@ plt.scatter(X_pole, y_pole_pred, color='red')
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 """
 # Select features and target variable
 mask1 = raw_df['HiggsM'] < upper_bound
