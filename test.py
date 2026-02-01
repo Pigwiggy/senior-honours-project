@@ -21,6 +21,9 @@ print(raw_df.shape)
 print(raw_df.head())
 print(raw_df.columns)
 
-HiggsM_df = raw_df['HiggsM']
+HiggsM_df = raw_df['lumiXsecWeight']
 print(HiggsM_df.shape)
 print(HiggsM_df.head()) 
+
+# N = cross section * luminosity
+# Sum of weights  = number of expected background events
