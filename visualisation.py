@@ -1,4 +1,4 @@
-# For visualisation purposes only
+# For visualisation purposes only, outputs in "graphs" folder
 
 import numpy as np
 import pandas as pd
