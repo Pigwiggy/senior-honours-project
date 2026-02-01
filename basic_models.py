@@ -1,4 +1,4 @@
-# Script for running basic models on the dataset (non-flow matching)
+# Script for running basic ML models on the dataset (non-flow matching)
 
 import numpy as np
 import pandas as pd
