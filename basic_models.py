@@ -4,56 +4,84 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import h5py
-from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
-from sklearn.ensemble import HistGradientBoostingClassifier
-from sklearn.metrics import roc_auc_score, roc_curve
 
 raw_df = pd.read_hdf('data_files/new_Input_NonResonant_yy_25th_January2026.h5', key='VBF_Polarisation_Tree')
 
 
+### Polynomial Regression Model with singular feature (HiggsM) ###
+
+# Define bounds and number of bins model
+lower_bound = 115000
+upper_bound = 135000
+num_bins = 275
+
+# Creating frequency distribution for HiggsM
+freq = pd.cut(raw_df['HiggsM'], bins=num_bins)
+freq_counts = freq.value_counts().sort_index()
+higgsM_values = [interval.mid for interval in freq_counts.index]
+frequencies = freq_counts.values.tolist()
+
+# Create DataFrame for ML Model
+model_df = pd.DataFrame({'HiggsM': higgsM_values, 'Frequency': frequencies})
+mask1 = model_df['HiggsM'] > upper_bound
+mask2 = model_df['HiggsM'] < lower_bound
+model_df_tails = model_df[mask1 | mask2]
+
+# Fit a polynomial regression model
+X = model_df_tails[['HiggsM']]
+y = model_df_tails['Frequency']
+poly = PolynomialFeatures(degree=3)
+X_poly = poly.fit_transform(X)
+lin_reg = LinearRegression()
+lin_reg.fit(X_poly, y)
+
+# Predict frequencies using the trained model
+model_df_pole = model_df[~(mask1 | mask2)]
+X_pole = model_df_pole[['HiggsM']]
+X_pole_poly = poly.transform(X_pole)
+y_pole_pred = lin_reg.predict(X_pole_poly)
+
+# Evaluate model performance with MSE
+y_pole_actual = model_df_pole['Frequency'].values
+mse = np.mean((y_pole_actual - y_pole_pred) ** 2)
+mse_normilized = mse / np.mean(y_pole_actual)
+print(f"Mean Squared Error (normalized) on pole region: {mse_normilized}")  
+
+plt.scatter(X,y)
+plt.scatter(X_pole, y_pole_pred, color='red')
+# plt.show()  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"""
 # Select features and target variable
-mask1 = raw_df['HiggsM'] < 140000
-mask2 = raw_df['HiggsM'] > 110000
+mask1 = raw_df['HiggsM'] < upper_bound
+mask2 = raw_df['HiggsM'] > lower_bound
+# tail_data_1 = raw_df[~(mask1)].copy()
+# tail_data_2 = raw_df[~(mask2)].copy()
 pole_data = raw_df[mask1 & mask2].copy()
 tail_data = raw_df[~(mask1 & mask2)].copy()
 
-
-# Use DNN_score, M_jj, Zepp, DPhi_jj, Eta_jj, Njets as feature and HiggsM as target
-
-features = ['DNN_score', 'M_jj', 'Zepp', 'DPhi_jj', 'Eta_jj', 'Njets']
-X_train = tail_data[features].values
-y_train = tail_data['is_signal'].values          # assuming 0 = background, 1 = signal
-w_train = tail_data['finalWeight'].values
-
-
-# Train
-model = HistGradientBoostingClassifier(
-    max_iter=200,          # like n_estimators
-    learning_rate=0.05,
-    max_depth=6,           # typical for HEP
-    random_state=42
-)
-
-model.fit(X_train, y_train, sample_weight=w_train)
-
-# Evaluate
-y_pred_proba = model.predict_proba(X_val)[:, 1]   # prob of being signal
-auc = roc_auc_score(y_val, y_pred_proba, sample_weight=w_val)
-print(f"Validation AUC: {auc:.4f}")
-
-# Compare to DNN_score
-dnn_val = df.loc[X_val.index, 'DNN_score'].values   # adjust indexing as needed
-print(f"Pearson correlation with DNN_score: {np.corrcoef(y_pred_proba, dnn_val)[0,1]:.3f}")
-"""
-model = LinearRegression()
-X_train = tail_data[features]
-y_train = tail_data['HiggsM']
-model.fit(X_train, y_train)
-
-X_pole = pole_data[features]
-pred_background = model.predict(X_pole)
+features = ['HiggsM']
+freq, bins = pd.cut(tail_data[features[0]], bins=intervals, retbins=True)
+frequency_counts = freq.value_counts().sort_index()
 """
 
-print(raw_df.columns)
+
 
