@@ -13,7 +13,7 @@ raw_df = pd.read_hdf('data_files/new_Input_NonResonant_yy_25th_January2026.h5', 
 
 ### Polynomial Regression Model with singular feature (HiggsM) ###
 
-# Define bounds and number of bins model
+# Define bounds and number of bins
 lower_bound = 115000
 upper_bound = 135000
 num_bins = 275
