@@ -52,7 +52,8 @@ print(f"Mean Squared Error (normalized) on pole region: {mse_normilized}")
 
 plt.scatter(X,y)
 plt.scatter(X_pole, y_pole_pred, color='red')
-# plt.show()  
+plt.show()
+plt.savefig('polynomial_regression_plot.png')
 
 
 
