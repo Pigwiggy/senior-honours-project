@@ -7,6 +7,7 @@ import h5py
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
+from scipy.stats import ks_2samp
 
 raw_df = pd.read_hdf('data_files/new_Input_NonResonant_yy_25th_January2026.h5', key='VBF_Polarisation_Tree')
 
@@ -50,13 +51,12 @@ mse = mean_squared_error(y_pole_true, y_pole_pred)
 mse_normilized = mse / np.var(y_pole_true)
 print(f"Mean Squared Error (normalized) on pole region: {mse_normilized}")  
 
+D_freq, p_freq = ks_2samp(y_pole_true, y_pole_pred, alternative='two-sided')
+print("Frequency: D =", D_freq, "p =", p_freq)
+
 plt.scatter(X,y)
 plt.scatter(X_pole, y_pole_pred, color='red')
 plt.show()
-
-
-
-
 
 
 """
