@@ -17,7 +17,7 @@ raw_df = pd.read_hdf('data_files/new_Input_NonResonant_yy_25th_January2026.h5', 
 # Define bounds and number of bins
 lower_bound = 115000
 upper_bound = 135000
-num_bins = 275
+num_bins = 1100
 
 # Creating frequency distribution for HiggsM
 freq = pd.cut(raw_df['HiggsM'], bins=num_bins)
@@ -52,7 +52,44 @@ mse_normilized = mse / np.var(y_pole_true)
 print(f"Mean Squared Error (normalized) on pole region: {mse_normilized}")  
 
 D_freq, p_freq = ks_2samp(y_pole_true, y_pole_pred, alternative='two-sided')
-print("Frequency: D =", D_freq, "p =", p_freq)
+print("Kolmogorov-Smirnov test: D =", D_freq, "p =", p_freq)
+
+# Ensuring that both arrays have the same shape for KL Divergence calculation by trimming both ends
+counter = 0
+if y_pole_pred.shape > y_pole_true.shape:
+    while y_pole_pred.shape != y_pole_true.shape:
+        if counter % 2 == 0: 
+            y_pole_pred = np.delete(y_pole_pred, -1, axis=0)
+            counter += 1
+        else:
+            y_pole_pred = np.delete(y_pole_pred, 0, axis=0)
+        counter += 1
+
+elif y_pole_pred.shape < y_pole_true.shape:
+    while y_pole_pred.shape != y_pole_true.shape:
+        if counter % 2 == 0: 
+            y_pole_true = np.delete(y_pole_true, -1, axis=0)
+            counter += 1
+        else:
+            y_pole_true = np.delete(y_pole_true, 0, axis=0)
+            counter += 1
+        
+
+# Implement KL Divergence calculation
+true_sum = np.sum(y_pole_true)
+p = np.array(y_pole_true) / true_sum
+pred_sum = np.sum(y_pole_pred)
+q = np.array(y_pole_pred) / pred_sum
+
+epsilon = 1e-10
+p_smooth = p + epsilon
+q_smooth = q + epsilon
+
+print(p_smooth.shape, q_smooth.shape)
+
+kl_divergence = np.sum(p_smooth * np.log(p_smooth / q_smooth))
+print(f"KL Divergence between true and predicted distributions in the pole region: {kl_divergence}")
+
 
 plt.scatter(X,y)
 plt.scatter(X_pole, y_pole_pred, color='red')
